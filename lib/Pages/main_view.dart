@@ -1,11 +1,12 @@
 import 'package:arduino_app/Component/Widget/Text/textwidget.dart';
+import 'package:arduino_app/Controller/main_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:arduino_app/Component/Widget/Co2Gauge/carbondioxide_gauge.dart';
 import 'package:arduino_app/Component/Widget/VocGauge/voc_gauge.dart';
 import 'package:arduino_app/Component/Widget/Graph/line_graph.dart';
 
-class MainView extends StatelessWidget {
+class MainView extends GetView<MainController> {
   const MainView({Key? key}) : super(key: key);
 
   @override
@@ -48,15 +49,17 @@ class MainView extends StatelessWidget {
                                   height: Get.height,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.end,
-                                    children: const [
-                                      TextWidget(
-                                        title: 'INSIDE',
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        textAlign: TextAlign.center,
+                                    children: [
+                                      Obx(
+                                        () => TextWidget(
+                                          title: controller.co2Header.value,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
-                                      SizedBox(height: 20),
-                                      CarbondioxideGauge(),
+                                      const SizedBox(height: 20),
+                                      const CarbondioxideGauge(),
                                     ],
                                   ),
                                 ),
@@ -70,91 +73,23 @@ class MainView extends StatelessWidget {
                                   height: Get.height,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.end,
-                                    children: const [
-                                      TextWidget(
-                                        title: 'OUTSIDE',
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        textAlign: TextAlign.center,
+                                    children: [
+                                      Obx(
+                                        () => TextWidget(
+                                          title: controller.tvocHeader.value,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
-                                      SizedBox(height: 20),
-                                      VocGauge(),
+                                      const SizedBox(height: 20),
+                                      const VocGauge(),
                                     ],
                                   ),
                                 ),
                               )),
                         ],
                       ),
-                    ),
-                  )),
-              Flexible(
-                  flex: 1,
-                  child: SizedBox(
-                    width: Get.width,
-                    height: Get.height,
-                    child: Row(
-                      children: [
-                        Flexible(
-                            flex: 1,
-                            child: Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Container(
-                                width: Get.width,
-                                height: Get.height,
-                                color: Colors.cyan[200],
-                                child: Stack(
-                                  children: const [
-                                    Positioned.fill(
-                                        top: 20,
-                                        child: Center(
-                                          child: TextWidget(
-                                            title: '27%',
-                                            fontSize: 35,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        )),
-                                    Positioned(
-                                        top: 10,
-                                        left: 10,
-                                        child: TextWidget(
-                                          title: 'BATTERY',
-                                          fontSize: 12,
-                                        ))
-                                  ],
-                                ),
-                              ),
-                            )),
-                        Flexible(
-                            flex: 1,
-                            child: Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Container(
-                                width: Get.width,
-                                height: Get.height,
-                                color: Colors.cyan[200],
-                                child: Stack(
-                                  children: const [
-                                    Positioned.fill(
-                                        top: 20,
-                                        child: Center(
-                                          child: TextWidget(
-                                            title: '55%',
-                                            fontSize: 35,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        )),
-                                    Positioned(
-                                        top: 10,
-                                        left: 10,
-                                        child: TextWidget(
-                                          title: 'BATTERY',
-                                          fontSize: 12,
-                                        ))
-                                  ],
-                                ),
-                              ),
-                            )),
-                      ],
                     ),
                   )),
               Flexible(
@@ -174,38 +109,43 @@ class MainView extends StatelessWidget {
                     ),
                   )),
               Flexible(
-                  flex: 1,
-                  child: SizedBox(
-                    width: Get.width,
-                    height: Get.height,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        MaterialButton(
-                          color: Colors.pink,
-                          minWidth: 120,
-                          onPressed: () {},
-                          child: const TextWidget(
-                            title: 'RELAY 1 ON',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
+                flex: 1,
+                child: SizedBox(
+                  width: Get.width,
+                  height: Get.height,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      MaterialButton(
+                        color: Colors.pink,
+                        minWidth: 120,
+                        onPressed: () {
+                          controller.sendcmd("poweroff");
+                        },
+                        child: const TextWidget(
+                          title: 'RELAY 1 ON',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
                         ),
-                        MaterialButton(
-                          color: Colors.grey,
-                          minWidth: 120,
-                          onPressed: () {},
-                          child: const TextWidget(
-                            title: 'RELAY 2 OFF',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
+                      ),
+                      MaterialButton(
+                        color: Colors.grey,
+                        minWidth: 120,
+                        onPressed: () {
+                          controller.sendcmd("poweron");
+                        },
+                        child: const TextWidget(
+                          title: 'RELAY 2 OFF',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
                         ),
-                      ],
-                    ),
-                  )),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
