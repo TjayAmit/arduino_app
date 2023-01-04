@@ -12,7 +12,7 @@ class VocGauge extends GetView<MainController> {
     return Obx(
       () => SizedBox(
           width: Get.width * 0.5,
-          height: Get.width * 0.5,
+          height: Get.width * 0.4,
           child: SfRadialGauge(
             axes: <RadialAxis>[
               RadialAxis(
@@ -23,7 +23,7 @@ class VocGauge extends GetView<MainController> {
                 showTicks: false,
                 showLabels: false,
                 minimum: 1,
-                maximum: 550,
+                maximum: 9000,
                 interval: 10,
                 pointers: [
                   RangePointer(
