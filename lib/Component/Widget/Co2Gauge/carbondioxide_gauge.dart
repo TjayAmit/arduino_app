@@ -12,7 +12,7 @@ class CarbondioxideGauge extends GetView<MainController> {
     return Obx(
       () => SizedBox(
           width: Get.width * 0.5,
-          height: Get.width * 0.5,
+          height: Get.width * 0.4,
           child: SfRadialGauge(
             axes: <RadialAxis>[
               RadialAxis(
