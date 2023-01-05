@@ -93,8 +93,14 @@ class MainController extends GetxController {
     initializeSocket();
     mssg.listen((p0) {
       var data = p0.trim().split("|");
-      tvoc.value = double.parse(data[0]);
-      co2.value = double.parse(data[1]);
+      double val = double.parse(data[0]);
+      if (val < 9000) {
+        tvoc.value = val;
+      }
+      double val1 = double.parse(data[1]);
+      if (val1 < 2100) {
+        co2.value = val1;
+      }
       listCo2.add(co2.value);
       listTvoc.add(tvoc.value);
       print(p0.trim());
