@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 class MainController extends GetxController {
   IOWebSocketChannel? socket;
 
-  RxBool connected = true.obs;
+  RxBool connected = false.obs;
   RxBool ledstatus = true.obs;
 
   RxString mssg = "".obs;
@@ -101,21 +101,25 @@ class MainController extends GetxController {
     });
 
     tvoc.listen((p0) {
-      if (p0 > 661) {
-        notify("Warning TVoc is in High Level", "Tvoc status: $p0");
+      if (p0 < 9000) {
+        if (p0 > 661) {
+          notify("Warning TVoc is in High Level", "Tvoc status: $p0");
+        }
+        checkChangesOfTvoc();
+        initLineGraphForTvoc();
+        initLineGraphForTvocPM();
       }
-      checkChangesOfTvoc();
-      initLineGraphForTvoc();
-      initLineGraphForTvocPM();
     });
 
     co2.listen((p0) {
-      if (p0 > 1100) {
-        notify("Warning Co\u00B2 is in High Level", "Co\u00B2 status: $p0");
+      if (p0 < 2100) {
+        if (p0 > 1100) {
+          notify("Warning Co\u00B2 is in High Level", "Co\u00B2 status: $p0");
+        }
+        checkChangesOfCarbonDioxide();
+        initLineGraphForCo2();
+        initLineGraphForCo2PM();
       }
-      checkChangesOfCarbonDioxide();
-      initLineGraphForCo2();
-      initLineGraphForCo2PM();
     });
   }
 
@@ -393,13 +397,13 @@ class MainController extends GetxController {
   }
 
   void initializeSocket() async {
-    try {
-      socket = IOWebSocketChannel.connect('ws://192.168.13.133:432');
-      connected.value = true;
-      streamWebSocket();
-    } catch (e) {
-      print(e.toString());
-    }
+    socketInitializing("Starting websocket");
+  }
+
+  void socketInitializing(String status) {
+    print(status);
+    socket = IOWebSocketChannel.connect('ws://192.168.13.133:432');
+    streamWebSocket();
   }
 
   void streamWebSocket() {
@@ -411,18 +415,20 @@ class MainController extends GetxController {
           } catch (_) {
             print('ignoring proccess');
           }
+          connected.value = true;
         },
         onDone: () {
           //if WebSocket is disconnected
           print("Web socket is closed");
-          connected.value = false;
         },
         onError: (error) {
-          print(error.toString());
+          connected.value = false;
+          Future.delayed(const Duration(milliseconds: 1000),
+              () => socketInitializing("Timeout Restarting websocket"));
         },
       );
-    } catch (_) {
-      print("error on connecting to websocket.");
+    } catch (e) {
+      print(e.toString());
     }
   }
 
