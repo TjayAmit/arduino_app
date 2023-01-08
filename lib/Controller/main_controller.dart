@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:arduino_app/Controller/notification_controller.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:get/get.dart';
@@ -7,6 +9,8 @@ import 'package:flutter/material.dart';
 
 class MainController extends GetxController {
   IOWebSocketChannel? socket;
+
+  RxString logsDetails = "".obs;
 
   RxBool connected = false.obs;
   RxBool ledstatus = true.obs;
@@ -20,15 +24,15 @@ class MainController extends GetxController {
 
   RxBool tvocStatus = false.obs;
   RxBool co2Status = false.obs;
+  
+  RxInt test = 0.obs;
 
   RxString co2Header = "Good".obs;
   RxString tvocHeader = "Good".obs;
 
-  RxList<double> listCo2 = RxList<double>([]).obs();
   RxList<FlSpot> listCo2Graph = RxList<FlSpot>([]).obs();
   RxList<FlSpot> listCo2GraphPM = RxList<FlSpot>([]).obs();
 
-  RxList<double> listTvoc = RxList<double>([]).obs();
   RxList<FlSpot> listTvocGraph = RxList<FlSpot>([]).obs();
   RxList<FlSpot> listTvocGraphPM = RxList<FlSpot>([]).obs();
 
@@ -93,40 +97,47 @@ class MainController extends GetxController {
     initializeSocket();
     mssg.listen((p0) {
       var data = p0.trim().split("|");
+      if(test.value > 20){
+        logsDetails.value = '';
+      }
       double val = double.parse(data[0]);
-      if (val < 9000) {
-        tvoc.value = val;
-      }
       double val1 = double.parse(data[1]);
-      if (val1 < 2100) {
-        co2.value = val1;
-      }
-      listCo2.add(co2.value);
-      listTvoc.add(tvoc.value);
-      print(p0.trim());
+      logsDetails.value += "\n$p0";
+      test.value++;
+
+      // if (val < 9000) {
+      //   tvoc.value = val;
+      // }
+
+      // if (val1 < 2100) {
+      //   co2.value = val1;
+      // }
+
+      // print(p0.trim());
     });
 
-    tvoc.listen((p0) {
-      if (p0 < 9000) {
-        if (p0 > 661) {
-          notify("Warning TVoc is in High Level", "Tvoc status: $p0");
-        }
-        checkChangesOfTvoc();
-        initLineGraphForTvoc();
-        initLineGraphForTvocPM();
-      }
-    });
 
-    co2.listen((p0) {
-      if (p0 < 2100) {
-        if (p0 > 1100) {
-          notify("Warning Co\u00B2 is in High Level", "Co\u00B2 status: $p0");
-        }
-        checkChangesOfCarbonDioxide();
-        initLineGraphForCo2();
-        initLineGraphForCo2PM();
-      }
-    });
+    // tvoc.listen((p0) {
+    //   if (p0 < 9000) {
+    //     if (p0 > 661) {
+    //       notify("Warning TVoc is in High Level", "Tvoc status: $p0");
+    //     }
+    //     checkChangesOfTvoc();
+    //     initLineGraphForTvoc();
+    //     initLineGraphForTvocPM();
+    //   }
+    // });
+
+    // co2.listen((p0) {
+    //   if (p0 < 2100) {
+    //     if (p0 > 1100) {
+    //       notify("Warning Co\u00B2 is in High Level", "Co\u00B2 status: $p0");
+    //     }
+    //     checkChangesOfCarbonDioxide();
+    //     initLineGraphForCo2();
+    //     initLineGraphForCo2PM();
+    //   }
+    // });
   }
 
   void initLineGraphForTvoc() {
@@ -349,14 +360,6 @@ class MainController extends GetxController {
   void checkChangesOfTvoc() {
     double p0 = tvoc.value;
 
-    // if (p0 > 3301) {
-    //   tvocColor.value = Colors.deepPurple;
-    //   tvocHeader.value = 'Very High';
-    // }
-    // if (p0 > 2201 && p0 < 3300) {
-    //   tvocColor.value = Colors.deepPurpleAccent;
-    //   tvocHeader.value = 'Very High';
-    // }
     if (p0 > 1431) {
       tvocColor.value = Colors.red;
       tvocHeader.value = 'Very High';
